@@ -1,0 +1,335 @@
+﻿@page "/GridWithUIOptions"
+
+@using System.Collections.ObjectModel
+@using Telerik.Blazor
+@using Telerik.Blazor.Components
+@using TelerikQ125.Pages.Dtos
+@using telerik_Q1_25.Pages.Dtos
+
+ages.Dtos.SelectionAndPricing
+<h3>GridWithUIOptions</h3>
+
+<TelerikGrid Data="@Items" 
+FilterMode="@GridFilterMode.FilterMenu"
+EditMode="@GridEditMode.Incell"
+Sortable="true"
+Resizable="true"
+Reorderable="true"
+ShowColumnMenu="true"
+Size="@ThemeConstants.Grid.Size.Small"
+Navigable="true"
+Pageable="true"
+OnUpdate=@OnUpdateLineItemClickAsync
+OnEdit="@EditHandlerAsync">
+
+
+    <GridColumns>
+        <GridCommandColumn Title="Actions" Width="136px" Context="gridCommandColumnDataItemContext" VisibleInColumnChooser = "false">
+            @{
+                var projectOrderItemDisplayDto = gridCommandColumnDataItemContext as ProjectLineItemDisplayDtoExtended;
+                <div style="min-height:30px">
+
+                    <GridCommandButton Title="Add/Update tags this Line Item" Icon="@( "fa fa-tags" )">
+                    </GridCommandButton>
+
+                </div>
+            }
+        </GridCommandColumn>
+        <GridColumn Field="@nameof(ProjectLineItemDisplayDtoExtended.LineNumber)" Width="100px" Title="Line#">
+        </GridColumn>
+        <GridColumn Field="@nameof(ProjectLineItemDisplayDtoExtended.Model)" Title="Model" Width="100px" Editable="false">
+        </GridColumn>
+        <GridColumn Field="@nameof(ProjectLineItemDisplayDtoExtended.Quantity)" Title="Quantity" Width="100px">
+        </GridColumn>
+        <GridColumn Field="@nameof(ProjectLineItemDisplayDtoExtended.Dimensions)" Title="Dimensions" Width="150px" Editable="false">
+        </GridColumn>
+        <GridColumn  Title="Edit Dimensions" Width="150px" Editable="true">
+            <Template Context="LineItemContext">
+                @{
+                    var item = LineItemContext as ProjectLineItemDisplayDtoExtended;
+
+                    @foreach (var uiOption in item.DimsUiOptions)
+                    {
+                        var dep = true;
+                        var enableControl = true;
+
+                        if (uiOption.ShowControl)
+                        {
+                            @foreach (var dependentUiOption in uiOption.DependentControls)
+                            {
+                                @if (dependentUiOption.ShowControl)
+                                {
+                                    @if (dependentUiOption.DependentControls?.Any() == true)
+                                    {
+                                        <fieldset>
+                                            <legend>@dependentUiOption.UIDescription</legend>
+                                            @foreach (var dependentUiOption2 in dependentUiOption.DependentControls)
+                                            {
+                                                @if (dependentUiOption2.ShowControl)
+                                                {
+                                                    <div class="row mt-1">
+                                                        <div class="col-4">
+                                                            <label>@(dependentUiOption2.UIDescription)</label>
+                                                        </div>
+                                                        <div class="col-8">
+                                                            <UiControlComponent UiOption="@dependentUiOption2"
+                                                                                Id="@("itemId"+item.LineNumber.ToString())"
+                                                                                DefaultText="-- Select Option --"
+                                                                                TabIndex="0"
+                                                                                Enable="@enableControl"
+                                                                                SelectedValueChanged="@((object selectedValue) => OnSelectedValueChanged(item, dependentUiOption2, selectedValue))">
+                                                            </UiControlComponent>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        </fieldset>
+                                    }
+                                    else
+                                    {
+                                        <div class="row mt-1">
+                                            <div class="col-4">
+                                                <label>@(dependentUiOption.UIDescription)</label>
+                                            </div>
+                                            <div class="col-8">
+                                                <UiControlComponent UiOption="@dependentUiOption" Id="@("itemId"+item.LineNumber.ToString())"
+                                                                    DefaultText="-- Select Option --"
+                                                                    TabIndex="0"
+                                                                    Enable="@enableControl"
+                                                                    SelectedValueChanged="@((object selectedValue) => OnSelectedValueChanged(item,dependentUiOption, selectedValue))">
+                                                </UiControlComponent>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            </Template>
+        </GridColumn>
+    </GridColumns>
+</TelerikGrid>
+
+@code {
+    public ObservableCollection<ProjectLineItemDisplayDtoExtended> Items { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var items = new ObservableCollection<ProjectLineItemDisplayDtoExtended>
+{
+    new ProjectLineItemDisplayDtoExtended
+    {
+        LineNumber = 1,
+        Model = "Model1",
+        Quantity = 1,
+        Dimensions = "10x10",
+        DimsUiOptions = new ObservableCollection<UIOption>
+        {
+            new UIOption
+            {
+                ValueName = "Numi_Size",
+                UIDescription = "",
+                UIControlType = "Group",
+                SelectedValue = 10,
+                ShowControl = true,
+                IsChildControl = false,
+                DependentControls = new ObservableCollection<UIOption>
+                {
+                    new UIOption
+                    {
+                        ValueName = "Width",
+                        UIDescription = "Width",
+                        UIControlType = "decimalBox",
+                        SelectedValue = 10,
+                        ShowControl = true,
+                        IsChildControl = true,
+                        DependentControls = new ObservableCollection<UIOption>()
+                    },
+                    new UIOption
+                    {
+                        ValueName = "Height",
+                        UIDescription = "Height",
+                        UIControlType = "decimalBox",
+                        SelectedValue = 10,
+                        ShowControl = true,
+                        IsChildControl = true,
+                        DependentControls = new ObservableCollection<UIOption>()
+                    }
+                }
+            }
+        }
+    },
+    new ProjectLineItemDisplayDtoExtended
+    {
+        LineNumber = 2,
+        Model = "Model2",
+        Quantity = 2,
+        Dimensions = "20x20",
+        DimsUiOptions = new ObservableCollection<UIOption>
+        {
+            new UIOption
+            {
+                ValueName = "Numi_Size",
+                UIDescription = "",
+                UIControlType = "Group",
+                ShowControl = true,
+                IsChildControl = false,
+                DependentControls = new ObservableCollection<UIOption>
+                {
+                    new UIOption
+                    {
+                        ValueName = "Width",
+                        UIDescription = "Width",
+                        UIControlType = "decimalBox",
+                        SelectedValue = 20,
+                        ShowControl = true,
+                        IsChildControl = true,
+                        DependentControls = new ObservableCollection<UIOption>()
+                    },
+                    new UIOption
+                    {
+                        ValueName = "Height",
+                        UIDescription = "Height",
+                        UIControlType = "decimalBox",
+                        SelectedValue = 20,
+                        ShowControl = true,
+                        IsChildControl = true,
+                        DependentControls = new ObservableCollection<UIOption>()
+                    }
+                }
+            }
+        }
+    },
+     new ProjectLineItemDisplayDtoExtended
+    {
+        LineNumber = 3,
+        Model = "Model3",
+        Quantity = 3,
+        Dimensions = "30x30",
+        DimsUiOptions = new ObservableCollection<UIOption>
+        {
+            new UIOption
+            {
+                ValueName = "Numi_Size",
+                UIDescription = "",
+                UIControlType = "Group",
+                ShowControl = true,
+                IsChildControl = false,
+                DependentControls = new ObservableCollection<UIOption>
+                {
+                    new UIOption
+                    {
+                        ValueName = "Width",
+                        UIDescription = "Width",
+                        UIControlType = "decimalBox",
+                        SelectedValue = 30,
+                        ShowControl = true,
+                        IsChildControl = true,
+                        DependentControls = new ObservableCollection<UIOption>()
+                    },
+                    new UIOption
+                    {
+                        ValueName = "Height",
+                        UIDescription = "Height",
+                        UIControlType = "decimalBox",
+                        SelectedValue = 30,
+                        ShowControl = true,
+                        IsChildControl = true,
+                        DependentControls = new ObservableCollection<UIOption>()
+                    }
+                }
+            }
+        }
+    },
+         new ProjectLineItemDisplayDtoExtended
+    {
+        LineNumber = 4,
+        Model = "Model3",
+        Quantity = 3,
+        Dimensions = "30x30",
+        DimsUiOptions = new ObservableCollection<UIOption>
+        {
+            new UIOption
+            {
+                ValueName = "Numi_Size",
+                UIDescription = "",
+                UIControlType = "Group",
+                ShowControl = true,
+                IsChildControl = false,
+                DependentControls = new ObservableCollection<UIOption>
+                {
+                    new UIOption
+                    {
+                        ValueName = "Width",
+                        UIDescription = "Width",
+                        UIControlType = "decimalBox",
+                        SelectedValue = 30,
+                        ShowControl = true,
+                        IsChildControl = true,
+                        DependentControls = new ObservableCollection<UIOption>()
+                    },
+                    new UIOption
+                    {
+                        ValueName = "Height",
+                        UIDescription = "Height",
+                        UIControlType = "decimalBox",
+                        SelectedValue = 30,
+                        ShowControl = true,
+                        IsChildControl = true,
+                        DependentControls = new ObservableCollection<UIOption>()
+                    }
+                }
+            }
+        }
+    }
+};
+        Items = items;
+    }
+     
+
+
+    private async Task OnUpdateLineItemClickAsync(GridCommandEventArgs args)
+    {
+    }
+    public async Task EditHandlerAsync(GridCommandEventArgs args)
+    {
+    }
+    protected void OnSelectedValueChanged(ProjectLineItemDisplayDtoExtended item, UIOption uiOption, object selectedValue)
+    {
+        try
+        {
+            // var oldValue = uiOption.SelectedValue;
+
+            var uo = uiOption.IsChildControl
+                                ? item.DimsUiOptions.Where(o => o.HasDependentControls)
+                                           .SelectMany(o => o.DependentControls)
+                                           .FirstOrDefault(o => o.ValueName == uiOption.ValueName)
+                                : item.DimsUiOptions.FirstOrDefault(o => o.ValueName == uiOption.ValueName);
+            if (uo != null) { uo.SelectedValue = selectedValue; }
+            // item.DimsUiOptions.Where(o=>o.ValueName == uiOption.ValueName).Select(o => { o.SelectedValue = selectedValue; return o; });
+
+            // ProjectEditPageViewModel.Items.Where(i => i.ItemId == item.ItemId).Select(i => { i.DimsUiOptions.Clear(); i.DimsUiOptions.AddRange(item.DimsUiOptions); return i; });
+            StateHasChanged();
+
+            //needed to force updating UIOptions collection -
+            // var uo = uiOption.IsChildControl
+            //                     ? UiOptions.Where(o => o.HasDependentControls)
+            //                                .SelectMany(o => o.DependentControls)
+            //                                .FirstOrDefault(o => o.ValueName == uiOption.ValueName)
+            //                     : UiOptions.FirstOrDefault(o => o.ValueName == uiOption.ValueName);
+            // if (uo != null) { uo.SelectedValue = selectedValue; }
+            // var log = new UserActivityDto { ActivityType = $"{uiOption.UIControlType}", ControlName = $"{uiOption.UIDescription}", NewValue = $"{uiOption.SelectedValue}", OriginalValue = $"{oldValue}" };
+            // OnUserActivity.InvokeAsync(log);
+            // OnStateHasChanged.InvokeAsync(null);
+
+        }
+        catch (Exception ex)
+        {
+        }
+        finally
+        {
+        }
+    }
+}

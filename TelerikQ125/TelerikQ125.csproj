@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Pages\Dtos\SelectionAndPricing\**" />
+    <Content Remove="Pages\Dtos\SelectionAndPricing\**" />
+    <EmbeddedResource Remove="Pages\Dtos\SelectionAndPricing\**" />
+    <None Remove="Pages\Dtos\SelectionAndPricing\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.14" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Telerik.UI.for.Blazor" Version="8.1.1" />
+  </ItemGroup>
+
+</Project>

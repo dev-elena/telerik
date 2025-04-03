@@ -1,0 +1,259 @@
+﻿@implements IDisposable
+@inject ILogger<UiControlComponent> Logger
+@inject IJSRuntime JsInterop
+
+@using Telerik.Blazor
+@using Telerik.Blazor.Components
+@using TelerikQ125.Pages.Dtos
+@using telerik_Q1_25.Pages.Dtos
+
+@if (UiControlType == UiControlTypeEnumeration.Group)
+{
+    <div></div>
+}
+
+@if (UiControlType == UiControlTypeEnumeration.IntBox)
+{
+
+
+    <span @onfocusin="@FocusInHandler" @ref="@InputWrapperRef">
+        <TelerikNumericTextBox Id="@Id"
+                               Class="@CombinedCssClass"
+                               Width="@Width"
+                               Min="0"
+                               Decimals="0"
+        @bind-Value="@ActualValueAsDecimal"
+                               OnChange="@OnTextBoxChanged"
+                               Enabled="@InternalEnable"
+                               TabIndex="@(TabIndex)">
+        </TelerikNumericTextBox>
+    </span>
+}
+
+@if (UiControlType == UiControlTypeEnumeration.DecimalBox)
+{
+
+
+
+    <span @onfocusin="@FocusInHandler" @ref="@InputWrapperRef">
+        <TelerikNumericTextBox Id="@Id"
+                               Class="@CombinedCssClass"
+                               Width="@Width"
+                               Min="0"
+                               Decimals="@NumberOfFractionalDigits"
+        @bind-Value="@ActualValueAsDecimal"
+                               OnChange="@OnTextBoxChanged"
+                               Enabled="@InternalEnable"
+                               TabIndex="@(TabIndex)">
+        </TelerikNumericTextBox>
+    </span>
+
+}
+
+
+
+<TelerikTooltip TargetSelector="@($"#{Id}")"
+                Position="TooltipPosition.Top" Class="@TooltipClass">
+
+    <Template Context="thisContext">
+            <div>
+                @GetTooltipAsUlMarkupString()
+            </div>
+    </Template>
+</TelerikTooltip>
+
+
+<style>
+    .no-callout .k-tooltip {
+        visibility: hidden;
+    }
+    .no-callout .k-tooltip .k-callout {
+        visibility: hidden;
+    }
+</style>
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public UIOption UiOption { get; set; }
+
+    [Parameter]
+    public int TabIndex { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+    [Parameter]
+    public string CssClassWithStatus { get { return CombinedCssClass; } set { _ = value; } }
+
+    [Parameter]
+    public string Width { get; set; } = "100%";
+
+    [Parameter]
+    public string DefaultText { get; set; }
+
+    [Parameter]
+    public EventCallback<object> SelectedValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback EditCustomVariantButtonClicked { get; set; }
+
+    [Parameter]
+    public EventCallback DeleteCustomVariantButtonClicked { get; set; }
+
+    [Parameter]
+    public int NumberOfFractionalDigits { get; set; } = 4;
+
+    [Parameter]
+    public bool Enable { get; set; }
+
+    public void Dispose()
+    {
+    }
+
+    async Task FocusInHandler(FocusEventArgs e)
+    {
+        // await JsInterop.SelectInputAsync(InputWrapperRef);
+    }
+
+    public ElementReference InputWrapperRef { get; set; }
+    protected int tabIndex { get; set; }
+
+    protected string ComponentName { get; set; }
+
+    protected UiControlTypeEnumeration UiControlType { get; set; }
+
+    protected string StatusCssClass
+    {
+        get
+        {
+            return string.Empty;
+        }
+    }
+    protected string TooltipClass => string.IsNullOrEmpty(GetTooltipAsUlMarkupString().Value) ? "no-callout" : "";
+    protected string CombinedCssClass =>
+        $"{CssClass} {StatusCssClass}";
+
+    protected string ActualValue { get; set; }
+
+    protected decimal? ActualValueAsDecimal
+    {
+        get => decimal.TryParse(ActualValue, out decimal result)
+            ? Math.Round(result, NumberOfFractionalDigits, MidpointRounding.AwayFromZero)
+            : null;
+        set => ActualValue = value.ToString();
+    }
+
+    protected string State { get; set; }
+
+    protected bool InternalEnable => Enable && UiOption.EnableControl;
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+            Id = $"B-{Guid.NewGuid().ToString()}";
+
+        tabIndex = TabIndex;
+
+        ComponentName = $"{UiOption.UIControlType}.{UiOption.StepID}";
+        UiControlType = BaseEnumeration.FromDisplayName<UiControlTypeEnumeration>(UiOption.UIControlType);
+        ActualValue = UiOption.SelectedValue?.ToString();
+
+        base.OnParametersSet();
+    }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+
+    }
+
+    protected void OnSelectedValueChanged(object selectedValue)
+    {
+
+        ActualValue = selectedValue?.ToString();
+
+        if (UiControlType == UiControlTypeEnumeration.DecimalBox || UiControlType == UiControlTypeEnumeration.IntBox)
+        {
+            ActualValueAsDecimal = decimal.TryParse(selectedValue?.ToString(), out decimal result)
+                ? Math.Round(result, NumberOfFractionalDigits, MidpointRounding.AwayFromZero)
+                : null;
+            if (ActualValueAsDecimal == null)
+            {
+                selectedValue = null;
+            }
+            else
+            {
+                selectedValue = ActualValueAsDecimal;
+            }
+        }
+
+        SelectedValueChanged.InvokeAsync(selectedValue);
+    }
+
+    protected void OnComboBoxBlurred()
+    {
+        if (!HasValueChanged()) return;
+        OnSelectedValueChanged(ActualValue); 
+    }
+
+    protected void OnSelectionListBlurred()
+    {
+        if (!HasValueChanged()) return;
+        if (!string.IsNullOrWhiteSpace(ActualValue))
+        {
+            var foundItem = UiOption.UISelectOptions.FirstOrDefault(o => o.OptionValue.StartsWith(ActualValue, StringComparison.OrdinalIgnoreCase));
+
+            if (foundItem is null)
+            {
+                ActualValue = null;
+            }
+            else
+            {
+                ActualValue = foundItem.OptionValue;
+            }
+        }
+        OnSelectedValueChanged(ActualValue);
+    }
+
+    protected void OnTextBoxChanged()
+    {
+        // if (!HasValueChanged()) return;
+        OnSelectedValueChanged(ActualValue); 
+    }
+
+    private bool HasValueChanged()
+    {
+        if (UiOption.SelectedValue?.ToString()?.Equals(ActualValue) == true) return false;
+        if (string.IsNullOrWhiteSpace(UiOption.SelectedValue?.ToString()) && string.IsNullOrWhiteSpace(ActualValue)) return false;
+        return true;
+    }
+
+    protected void OnCustomVariantEditClicked()
+    {
+        Logger.LogInformation($"{ComponentName}.{nameof(OnCustomVariantEditClicked)}()");
+        EditCustomVariantButtonClicked.InvokeAsync();
+    }
+
+    protected void OnCustomVariantDeleteClicked()
+    {
+        Logger.LogInformation($"{ComponentName}.{nameof(OnCustomVariantDeleteClicked)}()");
+        DeleteCustomVariantButtonClicked.InvokeAsync();
+    }
+
+    protected MarkupString GetTooltipAsUlMarkupString()
+    {
+        var stringBuilder = new System.Text.StringBuilder();
+        return new MarkupString(stringBuilder.ToString());
+    }
+
+    protected override bool ShouldRender()
+    {
+        var shouldRender = base.ShouldRender();
+        return shouldRender;
+    }
+
+}

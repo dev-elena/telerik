@@ -44,18 +44,18 @@ namespace TelerikQ125.Pages.Dtos
         }
         public bool IsChildControl { get; set; }
         public IList<UIOption> DependentControls { get; set; } = new List<UIOption>();
-        private bool _showControl;
-        public bool ShowControl
-        {
-            get
-            {
-                return _showControl;
-            }
-            set
-            {
-                _showControl = value;
-            }
-        }
+        //private bool _showControl;
+        //public bool ShowControl
+        //{
+        //    get
+        //    {
+        //        return _showControl;
+        //    }
+        //    set
+        //    {
+        //        _showControl = value;
+        //    }
+        //}
         private bool _enableControl = true;
         public bool EnableControl
         {

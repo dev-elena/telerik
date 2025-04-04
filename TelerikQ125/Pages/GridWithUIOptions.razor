@@ -43,7 +43,7 @@ OnEdit="@EditHandlerAsync">
         </GridColumn>
         <GridColumn Field="@nameof(ProjectLineItemDisplayDtoExtended.Dimensions)" Title="Dimensions" Width="150px" Editable="false">
         </GridColumn>
-        <GridColumn  Title="Edit Dimensions" Width="150px" Editable="true">
+        <GridColumn  Title="Edit Dimensions" Width="150px" Editable="false">
             <Template Context="LineItemContext">
                 @{
                     var item = LineItemContext as ProjectLineItemDisplayDtoExtended;
@@ -53,11 +53,11 @@ OnEdit="@EditHandlerAsync">
                         var dep = true;
                         var enableControl = true;
 
-                        if (uiOption.ShowControl)
+                        if (true)
                         {
                             @foreach (var dependentUiOption in uiOption.DependentControls)
                             {
-                                @if (dependentUiOption.ShowControl)
+                                @if (true)
                                 {
                                     @if (dependentUiOption.DependentControls?.Any() == true)
                                     {
@@ -65,7 +65,7 @@ OnEdit="@EditHandlerAsync">
                                             <legend>@dependentUiOption.UIDescription</legend>
                                             @foreach (var dependentUiOption2 in dependentUiOption.DependentControls)
                                             {
-                                                @if (dependentUiOption2.ShowControl)
+                                                @if (true)
                                                 {
                                                     <div class="row mt-1">
                                                         <div class="col-4">
@@ -133,7 +133,7 @@ OnEdit="@EditHandlerAsync">
                 UIDescription = "",
                 UIControlType = "Group",
                 SelectedValue = 10,
-                ShowControl = true,
+
                 IsChildControl = false,
                 DependentControls = new ObservableCollection<UIOption>
                 {
@@ -143,8 +143,7 @@ OnEdit="@EditHandlerAsync">
                         UIDescription = "Width",
                         UIControlType = "decimalBox",
                         SelectedValue = 10,
-                        ShowControl = true,
-                        IsChildControl = true,
+                                           IsChildControl = true,
                         DependentControls = new ObservableCollection<UIOption>()
                     },
                     new UIOption
@@ -153,7 +152,7 @@ OnEdit="@EditHandlerAsync">
                         UIDescription = "Height",
                         UIControlType = "decimalBox",
                         SelectedValue = 10,
-                        ShowControl = true,
+                      
                         IsChildControl = true,
                         DependentControls = new ObservableCollection<UIOption>()
                     }
@@ -174,7 +173,7 @@ OnEdit="@EditHandlerAsync">
                 ValueName = "Numi_Size",
                 UIDescription = "",
                 UIControlType = "Group",
-                ShowControl = true,
+                
                 IsChildControl = false,
                 DependentControls = new ObservableCollection<UIOption>
                 {
@@ -184,7 +183,7 @@ OnEdit="@EditHandlerAsync">
                         UIDescription = "Width",
                         UIControlType = "decimalBox",
                         SelectedValue = 20,
-                        ShowControl = true,
+                      
                         IsChildControl = true,
                         DependentControls = new ObservableCollection<UIOption>()
                     },
@@ -194,7 +193,7 @@ OnEdit="@EditHandlerAsync">
                         UIDescription = "Height",
                         UIControlType = "decimalBox",
                         SelectedValue = 20,
-                        ShowControl = true,
+                        
                         IsChildControl = true,
                         DependentControls = new ObservableCollection<UIOption>()
                     }
@@ -215,7 +214,7 @@ OnEdit="@EditHandlerAsync">
                 ValueName = "Numi_Size",
                 UIDescription = "",
                 UIControlType = "Group",
-                ShowControl = true,
+             
                 IsChildControl = false,
                 DependentControls = new ObservableCollection<UIOption>
                 {
@@ -225,7 +224,7 @@ OnEdit="@EditHandlerAsync">
                         UIDescription = "Width",
                         UIControlType = "decimalBox",
                         SelectedValue = 30,
-                        ShowControl = true,
+                      
                         IsChildControl = true,
                         DependentControls = new ObservableCollection<UIOption>()
                     },
@@ -235,7 +234,7 @@ OnEdit="@EditHandlerAsync">
                         UIDescription = "Height",
                         UIControlType = "decimalBox",
                         SelectedValue = 30,
-                        ShowControl = true,
+
                         IsChildControl = true,
                         DependentControls = new ObservableCollection<UIOption>()
                     }
@@ -256,7 +255,7 @@ OnEdit="@EditHandlerAsync">
                 ValueName = "Numi_Size",
                 UIDescription = "",
                 UIControlType = "Group",
-                ShowControl = true,
+              
                 IsChildControl = false,
                 DependentControls = new ObservableCollection<UIOption>
                 {
@@ -266,7 +265,7 @@ OnEdit="@EditHandlerAsync">
                         UIDescription = "Width",
                         UIControlType = "decimalBox",
                         SelectedValue = 30,
-                        ShowControl = true,
+                      
                         IsChildControl = true,
                         DependentControls = new ObservableCollection<UIOption>()
                     },
@@ -276,7 +275,7 @@ OnEdit="@EditHandlerAsync">
                         UIDescription = "Height",
                         UIControlType = "decimalBox",
                         SelectedValue = 30,
-                        ShowControl = true,
+                        
                         IsChildControl = true,
                         DependentControls = new ObservableCollection<UIOption>()
                     }

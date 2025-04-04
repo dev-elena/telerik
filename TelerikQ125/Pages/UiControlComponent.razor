@@ -22,7 +22,7 @@
                                Width="@Width"
                                Min="0"
                                Decimals="0"
-        @bind-Value="@ActualValueAsDecimal"
+                               @bind-Value="@ActualValueAsDecimal"
                                OnChange="@OnTextBoxChanged"
                                Enabled="@InternalEnable"
                                TabIndex="@(TabIndex)">
@@ -41,7 +41,7 @@
                                Width="@Width"
                                Min="0"
                                Decimals="@NumberOfFractionalDigits"
-        @bind-Value="@ActualValueAsDecimal"
+                               @bind-Value="@ActualValueAsDecimal"
                                OnChange="@OnTextBoxChanged"
                                Enabled="@InternalEnable"
                                TabIndex="@(TabIndex)">
@@ -144,7 +144,14 @@
         get => decimal.TryParse(ActualValue, out decimal result)
             ? Math.Round(result, NumberOfFractionalDigits, MidpointRounding.AwayFromZero)
             : null;
-        set => ActualValue = value.ToString();
+        set
+        {
+            if (ActualValueAsDecimal != value)
+            {
+                ActualValue = value.ToString();
+                OnSelectedValueChanged(value);
+            }
+        }
     }
 
     protected string State { get; set; }
@@ -221,8 +228,8 @@
 
     protected void OnTextBoxChanged()
     {
-        // if (!HasValueChanged()) return;
-        OnSelectedValueChanged(ActualValue); 
+        if (!HasValueChanged()) return;
+        OnSelectedValueChanged(ActualValueAsDecimal); 
     }
 
     private bool HasValueChanged()

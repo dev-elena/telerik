@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
@@ -19,6 +18,8 @@ namespace TelerikQ125.Pages.Dtos
         public string UIDescription { get; set; }
         public string UIControlType { get; set; }
         private object selectedValue;
+        // ...existing code...
+
         public object SelectedValue
         {
             get => selectedValue;
@@ -26,13 +27,11 @@ namespace TelerikQ125.Pages.Dtos
             {
                 // Only apply the change if it is an actual change
                 if (UIControlType == UiControlTypeEnumeration.IntBox.DisplayName ||
-                    UIControlType == UiControlTypeEnumeration.DecimalBox.DisplayName
-                    )
+                    UIControlType == UiControlTypeEnumeration.DecimalBox.DisplayName)
                 {
                     if (Equals(selectedValue, value?.ConvertToNumericObject())) return;
                 }
                 else if (Equals(selectedValue, value)) return;
-
 
                 if (UIControlType == UiControlTypeEnumeration.IntBox.DisplayName ||
                     UIControlType == UiControlTypeEnumeration.DecimalBox.DisplayName ||
@@ -45,18 +44,18 @@ namespace TelerikQ125.Pages.Dtos
         }
         public bool IsChildControl { get; set; }
         public IList<UIOption> DependentControls { get; set; } = new List<UIOption>();
-        private bool _showControl;
-        public bool ShowControl
-        {
-            get
-            {
-                return _showControl;
-            }
-            set
-            {
-                _showControl = value;
-            }
-        }
+        //private bool _showControl;
+        //public bool ShowControl
+        //{
+        //    get
+        //    {
+        //        return _showControl;
+        //    }
+        //    set
+        //    {
+        //        _showControl = value;
+        //    }
+        //}
         private bool _enableControl = true;
         public bool EnableControl
         {
